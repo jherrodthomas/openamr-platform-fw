@@ -94,10 +94,10 @@ static inline void set_microros_net_transports(IPAddress agent_ip, uint16_t agen
 // ---- Assurance hardening (fork, 2026-10-20). Every value is a draft pending review; see the change record. ----
 #define FW_VERSION_STRING "openamr-fw 0.0.1+assurance.1"
 #ifndef CMD_VEL_MAX_LINEAR_MPS
-#define CMD_VEL_MAX_LINEAR_MPS   0.71f   // |linear.x| ceiling enforced at the command input (equals today's 68 rpm clamp; DQ-006)
+#define CMD_VEL_MAX_LINEAR_MPS   0.25f   // |linear.x| ceiling enforced at the command input: navigation limit plus margin (DQ-006 option A, 2026-10-20)
 #endif
 #ifndef CMD_VEL_MAX_ANGULAR_RPS
-#define CMD_VEL_MAX_ANGULAR_RPS  3.1f    // |angular.z| ceiling: 0.71 m/s differential at the 0.46 m track
+#define CMD_VEL_MAX_ANGULAR_RPS  0.6f    // |angular.z| ceiling: navigation limit 0.5 rad/s plus margin (DQ-006 option A); a bench image may override both defines
 #endif
 #define HW_WDT_WT                1       // i.MX RT WDOG1 timeout field: (WT+1) x 0.5 s -> 1.0 s. Reset if the control loop stalls.
 #define STALL_PWM_FRACTION       0.6f    // stall / encoder-loss (SF-06 draft): |pwm| above this fraction of PWM_MAX ...

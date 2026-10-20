@@ -78,8 +78,9 @@ The assurance fork adds the following to the overlay. Change record and impact a
   timeout, whether powered debug is compiled in, motion-fault bits, whether the encoder table is loaded, counts of
   rejected and clamped commands, uptime. A silent reboot shows as a new reset cause and `enc_cal=0`.
 - **`/cmd_vel` validation.** A command with a non-finite field becomes zero and does not feed the 200 ms watchdog,
-  so the base stops. `|linear.x|` is clamped to `CMD_VEL_MAX_LINEAR_MPS` (0.71 m/s) and `|angular.z|` to
-  `CMD_VEL_MAX_ANGULAR_RPS` (3.1 rad/s); `linear.y` is forced to 0. These equal today's effective limits.
+  so the base stops. `|linear.x|` is clamped to `CMD_VEL_MAX_LINEAR_MPS` (0.25 m/s) and `|angular.z|` to
+  `CMD_VEL_MAX_ANGULAR_RPS` (0.6 rad/s); `linear.y` is forced to 0. These are the navigation limits plus a margin
+  (assurance decision DQ-006, 2026-10-20); a bench image that needs faster motion overrides the two defines.
 - **Powered debug is OFF** in the reference build (`ENABLE_POWERED_DEBUG` commented out): `/debug/openloop`
   cannot drive the motors and `/debug/tune` is rejected. A bench image defines it; there, `/debug/tune` accepts
   only finite gains in [0, 50], a right-wheel gain in [0.5, 2.0], feedforward ≤ 50 and dither ≤ 200.
