@@ -17,6 +17,7 @@
 // Changes: this unit's pin map, PID gains (K_P 2.0 / K_I 0.1 / K_D 0.1),
 // MOTOR2_GAIN, measured drivetrain constants, and IMU/board selection.
 // 2026-10-12: Gate A label comments added (comments only, no value change).
+// 2026-10-20 (assurance fork): PWM_MAX/PWM_MIN parenthesised (PWM_MIN -1025 -> -1023).
 // This file remains licensed under Apache-2.0; see NOTICE.md and
 // LICENSE-Apache-2.0 at the repository root.
 // ---------------------------------------------------------------------------
@@ -123,8 +124,8 @@ ROBOT ORIENTATION
   #define MOTOR4_IN_A 3
   #define MOTOR4_IN_B 2
 
-  #define PWM_MAX pow(2, PWM_BITS) - 1
-  #define PWM_MIN -PWM_MAX
+  #define PWM_MAX (pow(2, PWM_BITS) - 1)   // parenthesised 2026-10-20: PWM_MIN was expanding to -(2^bits) - 1
+  #define PWM_MIN (-PWM_MAX)
 #endif
 
 #ifdef USE_GENERIC_1_IN_MOTOR_DRIVER
@@ -144,8 +145,8 @@ ROBOT ORIENTATION
   #define MOTOR4_IN_A 3
   #define MOTOR4_IN_B -1 //DON'T TOUCH THIS! This is just a placeholder
 
-  #define PWM_MAX pow(2, PWM_BITS) - 1
-  #define PWM_MIN -PWM_MAX
+  #define PWM_MAX (pow(2, PWM_BITS) - 1)   // parenthesised 2026-10-20: PWM_MIN was expanding to -(2^bits) - 1
+  #define PWM_MIN (-PWM_MAX)
 #endif
 
 #ifdef USE_BTS7960_MOTOR_DRIVER
@@ -165,8 +166,8 @@ ROBOT ORIENTATION
   #define MOTOR4_IN_A 4
   #define MOTOR4_IN_B 3
 
-  #define PWM_MAX pow(2, PWM_BITS) - 1
-  #define PWM_MIN -PWM_MAX
+  #define PWM_MAX (pow(2, PWM_BITS) - 1)   // parenthesised 2026-10-20: PWM_MIN was expanding to -(2^bits) - 1
+  #define PWM_MIN (-PWM_MAX)
 #endif
 
 #ifdef USE_ESC_MOTOR_DRIVER

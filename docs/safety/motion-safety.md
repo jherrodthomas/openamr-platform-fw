@@ -65,3 +65,29 @@ counts). This was corrected on 2026-06-19 by moving the encoder supply to 3.3 V 
 ~3.3 V, clean counting). If the 3.3 V rail ever browns out under load, the fallback is a series
 resistor (~1–2.2 kΩ) or divider per A/B line, or a level-shifter. Wiring details live in the
 hardware repo (`openamr-platform-hw`).
+
+## Assurance fork hardening (2026-10-20, draft, not yet verified on hardware)
+
+The assurance fork adds the following to the overlay. Change record and impact analysis:
+`openamrobot-assurance/assurance/07-supporting/impact/change-2026-10-20-fw-hardening.md`.
+
+- **Hardware watchdog.** The i.MX RT1062 WDOG1 is enabled at boot with a 1.0 s timeout and serviced from the
+  control-loop timer (agent connected) or from `loop()` (otherwise). A hung core or a wedged executor resets the
+  MCU; PWM is 0 after reset.
+- **`/firmware/status`** (`std_msgs/String`, 1 Hz): firmware version, reset cause (`SRC_SRSR` at boot), watchdog
+  timeout, whether powered debug is compiled in, motion-fault bits, whether the encoder table is loaded, counts of
+  rejected and clamped commands, uptime. A silent reboot shows as a new reset cause and `enc_cal=0`.
+- **`/cmd_vel` validation.** A command with a non-finite field becomes zero and does not feed the 200 ms watchdog,
+  so the base stops. `|linear.x|` is clamped to `CMD_VEL_MAX_LINEAR_MPS` (0.71 m/s) and `|angular.z|` to
+  `CMD_VEL_MAX_ANGULAR_RPS` (3.1 rad/s); `linear.y` is forced to 0. These equal today's effective limits.
+- **Powered debug is OFF** in the reference build (`ENABLE_POWERED_DEBUG` commented out): `/debug/openloop`
+  cannot drive the motors and `/debug/tune` is rejected. A bench image defines it; there, `/debug/tune` accepts
+  only finite gains in [0, 50], a right-wheel gain in [0.5, 2.0], feedforward ≤ 50 and dither ≤ 200.
+- **`/debug/enc_cal`** loads a table only if all 72 ratios are finite and in [0.5, 2.0]; otherwise nothing changes.
+  The per-boot alignment ritual still needs the open-loop spin and therefore a bench image.
+- **Stall / encoder-loss stop.** A wheel commanded above 60 % PWM whose measured speed stays below 2 rpm for 1 s
+  latches a motion fault: both wheels stop and the PIDs reset. The latch clears after `/cmd_vel` has commanded
+  zero for 1 s. Thresholds are drafts for the bench test.
+- `PWM_MIN` is now −1023 (was −1025 through a missing parenthesis).
+
+None of this is a substitute for the hardware E-stop, which is still not wired.
